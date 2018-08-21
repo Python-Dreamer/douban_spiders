@@ -1,0 +1,46 @@
+"""
+    作者：python_dreamer
+    功能：实现对豆瓣电视剧的简单爬取，与电影的爬取基本大同小异，所以就不再进行注释
+    日期：2018-08-21
+"""
+
+# -*- coding:utf-8 -*-
+import requests
+import json
+
+tv_url = 'https://movie.douban.com/j/new_search_subjects?sort=T&range=0,10&tags=%E7%94%B5%E8%A7%86%E5%89%A7&start='
+
+
+
+def main():
+    file = open('tv_info.json', 'w', encoding='utf-8')
+    f = open('tv.txt', 'w', encoding='utf-8')
+    for num in range(501):  # 998
+        print('开始第%d个网页' % (num + 1))
+        respond = requests.get(tv_url + str(num * 20))
+        html = respond.content.decode('utf-8')
+        html = json.loads(html)
+      
+        tv_info = {}
+    
+
+        for i in range(len(html['data'])):
+           
+            tv_info['电视剧名称'] = html['data'][i]['title']
+            if not html['data'][i]['directors']:
+                html['data'][i]['directors'].insert(0,'未知')
+            tv_info['导演'] = html['data'][i]['directors'][0]
+            tv_info['评分'] = html['data'][i]['rate']
+            tv_info['电视剧url'] = html['data'][i]['url']
+
+            f.write(str(tv_info) + '\n')
+            file.write(str(tv_info) + '\n')
+            tv_info = {}
+
+    file.close()
+    f.close()
+
+
+if __name__ == '__main__':
+    main()
+
