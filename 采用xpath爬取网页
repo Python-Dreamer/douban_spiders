@@ -1,0 +1,41 @@
+"""
+	作者:python_dreamer
+	功能：采用xpath对网页进行爬取
+	日期:2018-08-21
+"""
+#-*- coding:utf-8 -*-
+import requests
+from lxml import etree
+import time
+
+
+
+def main():
+
+	file = open('movie_.txt', 'w',encoding = 'utf-8')
+	 
+	header = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.12 Safari/537.36'}
+	for num in range(0, 914): 
+		#爬取的url
+		url = '目标网页'
+		respond = requests.get(url,headers = header,timeout = 20) 
+		print(str(respond) + str(num))
+		
+		html_str = respond.content.decode() 
+		html = etree.HTML(html_str)
+		xpath = 'xpath定位'
+		for i in range(15):
+      #对列表的进行第一个取
+			title = html.xpath(xpath + 'title的xpath具体定位')[0]
+			url  = html.xpath(xpath +'url的xpath具体定位' )[0]
+
+		
+			file.write('电影名：' + str(title) + '\t')
+			file.write('网址：' +  + str(url) + '\r\n')
+      #有些网页对爬虫进行了反爬虫操作，当访问量过于频繁，ip会被禁止访问，所以设置了睡眠时间
+			time.sleep(0.2)
+	
+	file.close()
+
+if __name__ == '__main__':
+	main()
