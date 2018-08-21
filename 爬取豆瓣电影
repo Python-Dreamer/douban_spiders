@@ -1,0 +1,54 @@
+"""
+    作者：python_dreamer
+    功能：实现对豆瓣进行简单的爬取
+    日期：2018/8/21
+"""
+# -*- coding:utf-8 -*-
+import requests
+import json
+
+#爬取的url链接
+movie_url = 'https://movie.douban.com/j/new_search_subjects?sort=T&range=0,10&tags=%E7%94%B5%E5%BD%B1&start='
+
+
+def main():
+    #打开两种文件格式
+    file = open('movie_info.json', 'w', encoding='utf-8')
+    f = open('movie_info.txt', 'w', encoding='utf-8')
+    #对页数进行遍历
+    for num in range(500): 
+        print('开始第%d个网页' % (num + 1))
+        #与豆瓣服务器建立连接 并对url进行拼接 不同的爬取网页拼接样式不同
+        respond = requests.get(movie_url + str(num * 20))
+        #将得到的响应字符串进行utf-8格式解码
+        html = respond.content.decode('utf-8')
+        #将字符串进行json解码成字典格式
+        html = json.loads(html)
+        
+        #创建一个存储电影信息的字典
+        movie_info = {}
+    
+        #对每页的内容进行遍历
+        for i in range(len(html['data'])):
+            #对应字典，取出相应的信息
+            movie_info['电影名称'] = html['data'][i]['title']
+            #在爬取的过程中发现有的电影没有导演，所以先进行判断，若无，则加上导演为未知。
+            #实际上，可以对每一条信息都进行判断
+            if not html['data'][i]['directors']:
+                html['data'][i]['directors'].insert(0,'未知')
+            movie_info['导演'] = html['data'][i]['directors'][0]
+            movie_info['评分'] = html['data'][i]['rate']
+            movie_info['电影url'] = html['data'][i]['url']
+
+            f.write(str(movie_info) + '\n')
+            file.write(str(movie_info) + '\n')
+            #文件写入后，将字典清空
+            movie_info = {}
+
+    file.close()
+    f.close()
+
+
+if __name__ == '__main__':
+    main()
+
